@@ -19,17 +19,20 @@ spring:
   # ──────────────────────────────────────────────
   ai:
     model:
-      chat: dashscope
+      chat: openai
       embedding: openai
+    # DashScope 各自动配置默认 matchIfMissing=true，未配 api-key 时启动即失败，整体关闭。
     dashscope:
-      api-key: ${OPENAI_API_KEY:your-dashscope-api-key}
-      base-url: ${OPENAI_BASE_URL:https://ai.jxbw.com/v1/chat/completions}
-      chat:
-        options:
-          model: deepseek-r1
+      enabled: false
+#    dashscope:
+#      api-key: ${OPENAI_API_KEY:your-dashscope-api-key}
+#      base-url: ${OPENAI_BASE_URL:https://ai.jxbw.com/v1/chat/completions}
+#      chat:
+#        options:
+#          model: deepseek-r1
     openai:
       api-key: ${OPENAI_API_KEY:your-openai-compatible-api-key}
-      base-url: ${OPENAI_BASE_URL:https://ai.jxbw.com/v1/chat/completions}
+      base-url: ${OPENAI_BASE_URL:https://ai.jxbw.com}
       chat:
         options:
           model: deepseek-r1
