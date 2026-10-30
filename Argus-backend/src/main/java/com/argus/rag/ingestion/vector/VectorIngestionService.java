@@ -110,6 +110,7 @@ public class VectorIngestionService {
         for (int i = 0; i < documents.size(); i += addBatchSize) {
             List<Document> subList = documents.subList(i, Math.min(i + addBatchSize, documents.size()));
             log.info("执行向量批次写入: batchStart={}, batchSize={}", i, subList.size());
+            // 框架处理：1.调用嵌入模型进行向量化     2.保存到向量数据库
             vectorStore.add(subList);
         }
     }

@@ -136,9 +136,12 @@ public class DocumentUploadService {
      */
     @Transactional
     public UploadInitResponse initUpload(HttpServletRequest request, UploadInitRequest uploadRequest) {
+        // 1.校验文件基础信息，返回归一化文件基础信息
         NormalizedInitRequest normalizedRequest = validateInitRequest(uploadRequest);
+        // 2.校验当前用户是否是当前组的拥有者
         Long groupId = normalizedRequest.groupId();
         CurrentUserService.CurrentUser currentUser = groupMembershipService.requireGroupOwner(groupId);
+        // 3.判断文件hash是否存在，存在则直接秒传复用
         DocumentEntity existingDocument = documentMapper.selectByGroupIdAndFileHash(groupId, normalizedRequest.fileHash());
         if (existingDocument != null && "READY".equals(existingDocument.getStatus())) {
             log.info("分片上传-秒传复用: groupId={}, userId={}, fileName={}, fileHash={}, reusedDocumentId={}",
@@ -151,12 +154,14 @@ public class DocumentUploadService {
             );
             return UploadInitResponse.instant(documentId);
         }
+        // 4.获取当前组用户上传的文件是否存在上传会话
         DocumentUploadSessionEntity existingSession = documentUploadSessionMapper.selectLatestReusableSession(
                 groupId,
                 currentUser.userId(),
                 normalizedRequest.fileHash()
         );
         if (existingSession != null) {
+            // 4.1 存在上传会话，则进行断点续传
             log.info("分片上传-续传恢复: groupId={}, userId={}, uploadId={}, fileName={}, fileHash={}, chunkSize={}, chunkCount={}",
                     groupId, currentUser.userId(), existingSession.getUploadId(), normalizedRequest.fileName(),
                     normalizedRequest.fileHash(), existingSession.getChunkSize(), existingSession.getChunkCount());
@@ -170,6 +175,7 @@ public class DocumentUploadService {
                     existingSession.getChunkCount()
             );
         }
+        // 4.2 不存在，则初始化上传会话，返回uploadId
         DocumentUploadSessionEntity session = buildUploadSession(groupId, currentUser.userId(), normalizedRequest);
         documentUploadSessionMapper.insert(session);
         log.info("分片上传-新建会话: groupId={}, userId={}, uploadId={}, fileName={}, fileHash={}, fileSize={}, chunkSize={}, chunkCount={}",
