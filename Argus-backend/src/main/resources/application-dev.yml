@@ -10,8 +10,8 @@ spring:
     name: argus-service
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:argus_rag}
-    username: ${DB_USERNAME:your-db-username}
-    password: ${DB_PASSWORD:your-db-password}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:root}
     driver-class-name: org.postgresql.Driver
 
   # ──────────────────────────────────────────────
@@ -22,13 +22,17 @@ spring:
       chat: dashscope
       embedding: openai
     dashscope:
-      api-key: ${DASHSCOPE_API_KEY:your-dashscope-api-key}
+      api-key: ${OPENAI_API_KEY:your-dashscope-api-key}
+      base-url: ${OPENAI_BASE_URL:https://ai.jxbw.com/v1/chat/completions}
       chat:
         options:
-          model: qwen-plus
+          model: deepseek-r1
     openai:
       api-key: ${OPENAI_API_KEY:your-openai-compatible-api-key}
-      base-url: ${OPENAI_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode}
+      base-url: ${OPENAI_BASE_URL:https://ai.jxbw.com/v1/chat/completions}
+      chat:
+        options:
+          model: deepseek-r1
       embedding:
         options:
           # 指定维度，确保与数据库表结构一致
@@ -65,9 +69,9 @@ spring:
 
 storage:
   minio:
-    endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
-    access-key: ${MINIO_ACCESS_KEY:your-minio-access-key}
-    secret-key: ${MINIO_SECRET_KEY:your-minio-secret-key}
+    endpoint: ${MINIO_ENDPOINT:http://192.168.7.199:9000}
+    access-key: ${MINIO_ACCESS_KEY:minioadmin}
+    secret-key: ${MINIO_SECRET_KEY:minioadmin}
     bucket: ${MINIO_BUCKET:argus-rag-documents}
 
 argus:
@@ -82,11 +86,11 @@ argus:
       refresh-cookie-name: ARGUS_RAG_REFRESH_TOKEN
       refresh-cookie-secure: false
     dev-admin:
-      username: ${ARGUS_RAG_DEV_ADMIN_USERNAME:your-admin-username}
-      email: ${ARGUS_RAG_DEV_ADMIN_EMAIL:your-admin-email@example.com}
-      display-name: ${ARGUS_RAG_DEV_ADMIN_DISPLAY_NAME:your-display-name}
-      password: ${ARGUS_RAG_DEV_ADMIN_PASSWORD:your-admin-password}
-      user-code: ${ARGUS_RAG_DEV_ADMIN_USER_CODE:your-admin-code}
+      username: ${ARGUS_RAG_DEV_ADMIN_USERNAME:lwladmin}
+      email: ${ARGUS_RAG_DEV_ADMIN_EMAIL:123456789@qq.com}
+      display-name: ${ARGUS_RAG_DEV_ADMIN_DISPLAY_NAME:lwladmin}
+      password: ${ARGUS_RAG_DEV_ADMIN_PASSWORD:123456}
+      user-code: ${ARGUS_RAG_DEV_ADMIN_USER_CODE:lwladmin}
 
 elasticsearch:
   host: ${ES_HOST:localhost}
