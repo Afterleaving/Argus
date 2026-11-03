@@ -360,7 +360,7 @@ public class QaChatService {
                 AtomicInteger charCount = new AtomicInteger(0);
 
                 // 流式场景使用纯文本 System Prompt，覆盖默认的 JSON 输出要求
-                // 使用 chatResponse() 获取 Flux<ChatResponse> 以便提取 usage
+                // 使用 chatResponse() 获取 Flux<ChatResponse> 以便提取 usage，组装流水线，不会发送请求，调用subscribe()方法才会触发调用
                 Flux<String> tokenFlux = qaChatClient.prompt()
                                 .system("你是群组知识问答助手，只能依据给定证据回答，不得补充外部知识或猜测。请直接输出纯文本回答正文，使用简体中文。不要输出 JSON、Markdown 等任何格式标记。")
                                 .user(userPrompt.getContents())

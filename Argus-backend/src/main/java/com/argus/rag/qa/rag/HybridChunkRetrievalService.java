@@ -135,9 +135,11 @@ public class HybridChunkRetrievalService {
         }
 
         Map<Long, RetrievalCandidate> candidates = new LinkedHashMap<>();
-
+        // 问题逐个进行双路检索获取检索结果
         for (String plannedQuery : queryPlan.queries()) {
+            // 向量相似度检索
             mergeVectorHits(candidates, validGroupId, plannedQuery);
+            // 关键词检索
             mergeKeywordHits(candidates, validGroupId, plannedQuery);
         }
 
@@ -151,7 +153,7 @@ public class HybridChunkRetrievalService {
             log.info("混合检索结果为空: groupId={}, elapsedMs={}", validGroupId, elapsedMs);
             return RetrievedEvidenceBundle.empty();
         }
-
+        // 通过RRF算法得分倒序
         List<RetrievalCandidate> sortedCandidates = candidates.values().stream()
                 .sorted(Comparator
                         .comparingDouble(RetrievalCandidate::rankingScore).reversed()

@@ -114,10 +114,11 @@ public class QaController {
 
         try {
             QaChatService.StreamContext streamContext = qaService.askStream(request, askQuestionRequest);
-
+            // 调用subscribe()方法，才会发送请求给LLM（此处有三层，靠近模型输出源头的为“最上游”，终端订阅者为“最下游”）
             streamContext.tokenStream()
                     .doOnNext(token -> {
                         try {
+                            // LLM回答输出的token
                             emitter.send(SseEmitter.event().name("token").data(token));
                         } catch (IOException e) {
                             throw new RuntimeException("SSE 发送 token 失败", e);
@@ -128,15 +129,18 @@ public class QaController {
                             List<AskQuestionResponse.Citation> citations = citationAssembler
                                     .assembleDocuments(streamContext.documents());
                             if (!citations.isEmpty()) {
+                                // 引用列表
                                 emitter.send(SseEmitter.event().name("citations").data(citations));
                             }
                             AskQuestionResponse.EvidenceOverview evidenceOverview = evidenceOverviewAssembler
                                     .assemble(streamContext.documents());
                             if (evidenceOverview != null) {
+                                // 证据概览
                                 emitter.send(SseEmitter.event().name("evidence-overview").data(evidenceOverview));
                             }
                             Long recordId = streamContext.recordId();
                             if (recordId != null) {
+                                // 记录ID
                                 emitter.send(SseEmitter.event().name("record").data(Map.of("recordId", recordId)));
                             }
                             emitter.complete();
@@ -151,6 +155,7 @@ public class QaController {
                             String message = error.getMessage() != null
                                     ? error.getMessage()
                                     : "流式问答服务内部错误";
+                            // 错误信息
                             emitter.send(SseEmitter.event().name("error")
                                     .data(Map.of("message", message)));
                             emitter.complete();
