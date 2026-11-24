@@ -46,6 +46,7 @@ public class DocumentIngestionAsyncListener {
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handle(DocumentIngestionRequestedEvent event) {
+        // TODO 当前方案默认线程池的阻塞队列无限大，优化改造：采用自定义线程池 + 内存队列 + 数据库实现，新增补偿机制
         log.info("收到文档异步ETL事件(事务已提交): documentId={}, groupId={}", event.documentId(), event.groupId());
         documentIngestionAsyncService.ingestDocument(event.documentId(), event.groupId());
     }
