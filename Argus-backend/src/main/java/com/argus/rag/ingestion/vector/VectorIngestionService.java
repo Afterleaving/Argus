@@ -138,11 +138,20 @@ public class VectorIngestionService {
 
     // 按文档维度删除向量库中已有记录，确保幂等写入。
     private void deleteExistingVectors(Set<Long> documentIds) {
-        FilterExpressionBuilder builder = new FilterExpressionBuilder();
-        for (Long documentId : documentIds) {
-            Filter.Expression filter = builder.eq("documentId", documentId).build();
-            vectorStore.delete(filter);
+        if (documentIds.isEmpty())
+        {
+            return;
         }
+        Filter.Expression filter;
+        if (documentIds.size() == 1)
+        {
+            filter = new FilterExpressionBuilder().eq("documentId", documentIds.iterator().next()).build();
+        }
+        else
+        {
+            filter = new FilterExpressionBuilder().in("documentId", documentIds).build();
+        }
+        vectorStore.delete(filter);
     }
 
     // 从 chunk 列表中提取去重后的 documentId 集合。

@@ -128,6 +128,7 @@ public class EtlDocumentIngestionProcessor implements DocumentIngestionProcessor
         List<Document> cleanedDocuments = textCleanupTransformer.apply(rawDocuments);
         log.info("文本清洗完成: documentId={}, groupId={}, cleanedDocuments={}",
                 documentId, groupId, cleanedDocuments.size());
+        // 文档预览文本更新到数据库（前200个字符）
         persistPreviewText(documentId, groupId, cleanedDocuments);
         List<Document> chunkDocuments = chunkTransformer.apply(cleanedDocuments);
         log.info("文档切片完成: documentId={}, groupId={}, chunkDocuments={}",

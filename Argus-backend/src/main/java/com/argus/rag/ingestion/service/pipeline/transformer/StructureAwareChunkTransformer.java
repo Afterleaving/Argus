@@ -235,6 +235,8 @@ public class StructureAwareChunkTransformer implements DocumentTransformer {
         metadata.put("charStart", range.start());
         metadata.put("charEnd", range.end());
         metadata.put("chunkStrategy", STRATEGY);
+        // TODO 页码
+
         String id = source.getId() == null ? null : source.getId() + ":" + chunkIndex;
         return Document.builder()
                 .id(id)
